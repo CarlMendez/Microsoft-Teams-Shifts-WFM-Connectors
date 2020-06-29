@@ -11,6 +11,8 @@ namespace Microsoft.Teams.App.KronosWfc.Service
     using System.Text;
     using System.Threading.Tasks;
     using Microsoft.Teams.App.KronosWfc.Common;
+    using Newtonsoft.Json.Linq;
+    using RestSharp;
 
     /// <summary>
     /// API helper Class.
@@ -46,6 +48,24 @@ namespace Microsoft.Teams.App.KronosWfc.Service
             }
 
             return new Tuple<string, string>(content, jSession);
+        }
+
+
+        private string AuthenticateToken()
+        {
+            var client = new RestClient("https://dev.api.tjx.com/gies/v1/oauth2/accesstoken?grant_type=client_credentials");
+            client.Timeout = -1;
+            var request = new RestRequest(Method.POST);
+            request.AddHeader("Authorization", "Basic Uko4OWR4dXVHODdKT3dBV3JyaGtQR1hKQVVQcmp0Sjk6aFI1ZlJjWkxjZUo2aWw2UQ==");
+            request.AddParameter("text/plain", "", ParameterType.RequestBody);
+            IRestResponse response = client.Execute(request);
+
+            // Console.WriteLine(response.Content);
+
+            string source = response.Content;
+            dynamic data = JObject.Parse(source);
+            string accessToken = data.access_token;
+            return accessToken;
         }
 
         /// <summary>
