@@ -8,6 +8,7 @@ namespace Microsoft.Teams.App.KronosWfc.Service
     using System.Globalization;
     using System.Linq;
     using System.Net.Http;
+    using System.Net.Http.Headers;
     using System.Text;
     using System.Threading.Tasks;
     using Microsoft.Teams.App.KronosWfc.Common;
@@ -77,10 +78,13 @@ namespace Microsoft.Teams.App.KronosWfc.Service
         /// <returns>Response message.</returns>
         private async Task<HttpResponseMessage> PostXmlRequestAsync(Uri baseUrl, string xmlString, string jSession)
         {
+            var accessToken = this.AuthenticateToken();
             if (string.IsNullOrEmpty(jSession))
             {
                 using (var httpClient = new HttpClient())
                 {
+                    
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
                     using (var httpContent = new StringContent(xmlString, Encoding.UTF8, "text/xml"))
                     {
                         httpContent.Headers.Add("SOAPAction", ApiConstants.SoapAction);
@@ -94,6 +98,7 @@ namespace Microsoft.Teams.App.KronosWfc.Service
                 {
                     using (var httpClient = new HttpClient(httpClientHandler))
                     {
+                        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
                         using (var httpContent = new StringContent(xmlString, Encoding.UTF8, "text/xml"))
                         {
                             httpContent.Headers.Add("SOAPAction", ApiConstants.SoapAction);
